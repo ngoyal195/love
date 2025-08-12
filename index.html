@@ -1,100 +1,245 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💌 For My Riya 💌</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>For Riya — A Little Letter</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    :root{
+      --bg1: #fff0f6;
+      --bg2: #fff7f0;
+      --accent: #ff6fa3;
+      --paper: rgba(255,255,255,0.85);
+      --muted: #6c4a56;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#ffeef6 0%, #fff6ec 50%, #f6eefc 100%);color:var(--muted);overflow-y:auto;-webkit-font-smoothing:antialiased;}
+    body{display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;}
+
+/* floating heart particles (background) */
+    .bg-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+    .bg-hearts .h{position:absolute;opacity:0.85;font-size:22px;transform:translateY(0);animation:rise 8s linear infinite;filter:drop-shadow(0 6px 12px rgba(255,111,163,0.08))}
+    @keyframes rise{
+      0%{transform:translateY(0) scale(0.7);opacity:0}
+      10%{opacity:1}
+      100%{transform:translateY(-900px) scale(1.05);opacity:0}
+    }
+
+/* centered paper card */
+    .card{position:relative;z-index:1;width:100%;max-width:760px;border-radius:20px;padding:36px 40px;background:var(--paper);box-shadow:0 18px 50px rgba(18,8,24,0.08);border:1px solid rgba(255,255,255,0.6);backdrop-filter: blur(6px);}
+
+/* pretty header */
+    .top{
+      display:flex;gap:14px;align-items:center;margin-bottom:18px;
+    }
+    .avatar{
+      width:62px;height:62px;border-radius:14px;background:linear-gradient(135deg,#ffd7ea,#ffecf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#a4005f;font-size:22px;box-shadow:0 6px 18px rgba(167,0,95,0.06)
+    }
+    h1{margin:0;font-size:20px;color:#462534;font-weight:600}
+    p.lead{margin:0;color:#6d4a55;font-size:13px}
+
+/* letter area looks like paper with shimmer border */
+    .letter {
+      position:relative;
+      padding:26px 26px;
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,252,0.98));
+      box-shadow: inset 0 -8px 30px rgba(255,111,163,0.02);
+      border: 1px solid rgba(255,111,163,0.09);
+      overflow:visible;
+      font-size:18px;line-height:1.8;color:#4b2f38;
       font-family: 'Dancing Script', cursive;
-      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-      color: #4a2c2a;
-      display: flex;
-      justify-content: center;
-      padding: 40px;
-      overflow-y: auto;
-      line-height: 1.8;
+      min-height:180px;
     }
 
-    .letter-container {
-      max-width: 600px;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      font-size: 1.4rem;
-      position: relative;
+    /* subtle shimmer outline */
+    .letter::before{
+      content:'';position:absolute;inset:-3px;border-radius:16px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,111,163,0.06), rgba(255,255,255,0.0));
+      filter:blur(8px);opacity:0.9;transform:rotate(-2deg);pointer-events:none;
+      animation: shimmer 4s linear infinite;
     }
+    @keyframes shimmer{0%{transform:rotate(-2deg) translateX(-8%)}50%{transform:rotate(-2deg) translateX(8%)}100%{transform:rotate(-2deg) translateX(-8%)}}
 
-    .heart {
-      position: absolute;
-      color: #ff4d6d;
-      font-size: 1.2rem;
-      animation: float 4s infinite ease-in-out;
-    }
+/* typed text and caret */
+    .typed { white-space:pre-wrap; word-break:break-word; font-size:20px; }
+    .caret { display:inline-block; width:9px; height:26px; background:linear-gradient(90deg,var(--accent),#ff9fbf); margin-left:6px; border-radius:3px; vertical-align:baseline; animation: blink 1s steps(2,start) infinite; }
+    @keyframes blink{50%{opacity:0}}
 
-    @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(15deg); }
-      100% { transform: translateY(0) rotate(0deg); }
+/* signature */
+    .signature{margin-top:18px;opacity:0;transform:translateY(10px);transition:all .8s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:6px}
+    .signature.show{opacity:1;transform:none}
+    .sig-name{font-family:'Dancing Script',cursive;font-size:34px;color:#e21f78;line-height:1}
+    .sig-sub{font-size:13px;color:#6f4a53}
+
+/* final heart pop */
+    .final-heart{position:fixed;left:50%;transform:translateX(-50%);bottom:18vh;width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0;pointer-events:none;z-index:2;animation: none;}
+
+/* responsive tweaks */
+    @media(max-width:560px){
+      .card{padding:22px}
+      .letter{font-size:18px}
+      .typed{font-size:18px}
+      .avatar{width:52px;height:52px;font-size:18px}
     }
   </style>
 </head>
 <body>
+  <div class="bg-hearts" aria-hidden="true" id="bgHearts"></div>
 
-<div class="letter-container" id="letter"></div>
+  <div class="card" role="main" aria-labelledby="letterTitle">
+    <div class="top">
+      <div class="avatar" aria-hidden="true">R ♥</div>
+      <div>
+        <h1 id="letterTitle">For Riya — ek chhota sa letter</h1>
+        <p class="lead">Thoda sa slow, thoda sa sweet — jaise tum</p>
+      </div>
+    </div>
+
+    <div class="letter" aria-live="polite">
+      <div id="typed" class="typed" aria-atomic="true"></div>
+      <span id="caret" class="caret" aria-hidden="true"></span>
+
+      <div id="signature" class="signature" aria-hidden="true">
+        <div class="sig-name">From, your forever Naman 💞</div>
+        <div class="sig-sub">Hamesha tumhara • Dooriyan sirf numbers hain</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="finalHeart" class="final-heart" aria-hidden="true">💖</div>
 
 <script>
-  const letterContent = `
-Hey meri pyari Riya ❤️,
+/* -------- CONFIG: EDIT THE HINGLISH LINES HERE -------- */
+const segments = [
+  {text:"Hey meri pyari Riya,\\n", pause:700},
+  {text:"Aaj bhi teri hasi ka ek chhota sa memory mere dil ko garam kar deta hai. ", pause:750, emoji:"😊"},
+  {text:"Doori kitni bhi ho, teri baatein mere paas rehti hain — calls, messages aur woh choti choti baatein jo sirf hum samajhte hain.\\n", pause:1000},
+  {text:"Main tumhe bahut miss karta hoon, par har miss ke saath ek naya promise banta hai — jaldi milenge. ", pause:900, emoji:"🤗"},
+  {text:"Tab tak ke liye, yeh chhota sa letter rakho apni pocket mein, jab kabhi tumhe thoda sa ghar chahiye ho.\\n", pause:900},
+  {text:"Tum meri favourite ho — mere har din ka bright spot. ", pause:800, emoji:"🌟"},
+  {text:"Love you, ab aur hamesha.\\n", pause:700},
+];
+/* --------------------------------------------------- */
 
-Jab bhi main tumhaare baare mein sochta hoon, ek cute si smile apne aap aa jaati hai 😘💖.  
-Chahe hum kitni bhi door ho, mera dil hamesha tumhare saath hota hai 💕.  
+const typedEl = document.getElementById('typed');
+const caret = document.getElementById('caret');
+const signature = document.getElementById('signature');
+const finalHeart = document.getElementById('finalHeart');
+const bgHearts = document.getElementById('bgHearts');
 
-Main jaanta hoon LDR easy nahi hota, par tum meri life ki woh roshni ho jo har distance ko meaningless bana deti hai ✨🌸.  
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-Tum meri morning ki pehli soch ho, aur raat ki last dua ❤️🙏.  
-I promise, ek din hum bina kisi screen ke ek hi table pe coffee piyenge ☕💞.
-
-Hamesha tumhara,  
-💗 Naman 💗
-`;
-
-  const container = document.getElementById('letter');
-  let i = 0;
-  const speed = 50; // typing speed
-
-  function typeLetter() {
-    if (i < letterContent.length) {
-      container.innerHTML += letterContent.charAt(i);
-      i++;
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-      });
-      setTimeout(typeLetter, speed);
-    }
+/* Typewriter with slight human-like variance */
+async function typeSegments(){
+  for(let s=0;s<segments.length;s++){
+    const seg = segments[s];
+    await typeText(seg.text, seg.emoji);
+    await wait(seg.pause);
   }
+  // finish
+  caret.style.display = 'none';
+  signature.classList.add('show');
+  signature.setAttribute('aria-hidden','false');
+  popFinalHeart();
+  burstBgHearts(10);
+}
 
-  // Floating hearts
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.innerHTML = '💖';
-    heart.style.left = Math.random() * 100 + '%';
-    heart.style.top = Math.random() * 100 + '%';
-    heart.style.fontSize = Math.random() * 20 + 15 + 'px';
-    document.body.appendChild(heart);
-
-    setTimeout(() => {
-      heart.remove();
-    }, 5000);
+/* types a string character-by-character with irregular timing */
+async function typeText(text, maybeEmoji){
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    // irregular speed: vowels slightly slower for realism
+    const base = 28;
+    const vowel = "aeiouAEIOUअआइईउऊएऐओऔािीुूेैोौंँँ";
+    let jitter = Math.random()*40;
+    let extra = vowel.includes(ch) ? 40 : 0;
+    typedEl.innerText += ch;
+    // occasionally add a tiny pause for punctuation / new line
+    const punct = ['.',',','!','?','\\n'];
+    await wait(base + jitter + extra + (punct.includes(ch) ? 180 : 0));
+    // keep the caret visible and scroll
+    scrollSmooth();
   }
-  setInterval(createHeart, 1000);
+  if(maybeEmoji){
+    const span = document.createElement('span');
+    span.textContent = ' ' + maybeEmoji + ' ';
+    span.style.display = 'inline-block';
+    span.style.transform = 'scale(0.6)';
+    span.style.transition = 'transform .25s ease';
+    typedEl.appendChild(span);
+    // tiny pop effect
+    requestAnimationFrame(()=> span.style.transform = 'scale(1)');
+    scrollSmooth();
+  }
+}
 
-  // Start typing
-  typeLetter();
+/* smooth auto-scroll to bottom of card as text grows */
+function scrollSmooth(){
+  // scroll page so the card stays comfortably visible
+  const card = document.querySelector('.card');
+  const rect = card.getBoundingClientRect();
+  const y = window.scrollY + rect.top - 40; // top of card
+  // prefer to scroll to end of text
+  const bottom = document.body.scrollHeight;
+  window.scrollTo({ top: Math.min(y + rect.height, bottom), behavior: 'smooth' });
+}
+
+/* final heart pop */
+function popFinalHeart(){
+  finalHeart.style.opacity = 1;
+  finalHeart.style.transform = 'translateX(-50%) scale(0.6)';
+  finalHeart.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1), opacity 600ms';
+  setTimeout(()=> finalHeart.style.transform = 'translateX(-50%) scale(1.12)', 60);
+  setTimeout(()=> finalHeart.style.transform = 'translateX(-50%) scale(1)', 700);
+  setTimeout(()=> finalHeart.style.opacity = 0, 3200);
+}
+
+/* background floating hearts generator */
+function createBgHeart(xPercent, delay, size){
+  const el = document.createElement('div');
+  el.className = 'h';
+  el.style.left = (xPercent||Math.random()*100) + '%';
+  el.style.bottom = '-30px';
+  el.style.fontSize = (size || (12 + Math.random()*30)) + 'px';
+  el.style.animationDuration = (6 + Math.random()*6) + 's';
+  el.style.animationDelay = (delay||0) + 's';
+  el.textContent = ['💖','💗','💕','❤️'][Math.floor(Math.random()*4)];
+  bgHearts.appendChild(el);
+  // remove after animation
+  setTimeout(()=> el.remove(), (parseFloat(el.style.animationDuration) + (parseFloat(el.style.animationDelay)||0))*1000 + 600);
+}
+
+/* occasionally burst many hearts */
+function burstBgHearts(count){
+  for(let i=0;i<count;i++){
+    createBgHeart(30 + Math.random()*40, i*0.05, 14 + Math.random()*24);
+  }
+}
+
+/* gentle periodic hearts */
+setInterval(()=> createBgHeart(), 900);
+
+/* start */
+window.addEventListener('load', ()=> {
+  setTimeout(()=> typeSegments(), 700);
+});
+
+/* accessibility: allow keyboard Enter to skip ahead to final (but not to speed type) */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    // reveal full text immediately if user presses Escape
+    const full = segments.map(s=>s.text + (s.emoji?(' '+s.emoji+' '):'')).join('\\n');
+    typedEl.innerText = full;
+    caret.style.display = 'none';
+    signature.classList.add('show');
+    popFinalHeart();
+  }
+});
 </script>
-
 </body>
 </html>
