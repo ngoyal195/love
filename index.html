@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="hi">
+<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -13,41 +13,53 @@
       --bg1: #fff0f6;
       --bg2: #fff7f0;
       --accent: #ff6fa3;
-      --paper: rgba(255,255,255,0.85);
+      --paper: rgba(255,255,255,0.95);
       --muted: #6c4a56;
     }
+
+    /* Basic */
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#ffeef6 0%, #fff6ec 50%, #f6eefc 100%);color:var(--muted);overflow-y:auto;-webkit-font-smoothing:antialiased;}
     body{display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;}
 
-/* floating heart particles (background) */
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .card, .bg-hearts .h, .final-heart, .typed .char, .signature.show .sig-name { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* floating heart particles (background) */
     .bg-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-    .bg-hearts .h{position:absolute;opacity:0.85;font-size:22px;transform:translateY(0);animation:rise 8s linear infinite;filter:drop-shadow(0 6px 12px rgba(255,111,163,0.08))}
+    .bg-hearts .h{position:absolute;opacity:0.95;font-size:22px;transform:translateY(0);animation:rise 8s linear infinite;filter:drop-shadow(0 6px 12px rgba(255,111,163,0.08))}
     @keyframes rise{
       0%{transform:translateY(0) scale(0.7);opacity:0}
       10%{opacity:1}
       100%{transform:translateY(-900px) scale(1.05);opacity:0}
     }
 
-/* centered paper card */
-    .card{position:relative;z-index:1;width:100%;max-width:760px;border-radius:20px;padding:36px 40px;background:var(--paper);box-shadow:0 18px 50px rgba(18,8,24,0.08);border:1px solid rgba(255,255,255,0.6);backdrop-filter: blur(6px);}
+    /* centered paper card + fade-in */
+    .card{
+      position:relative;z-index:1;width:100%;max-width:760px;border-radius:20px;padding:36px 40px;background:var(--paper);box-shadow:0 18px 50px rgba(18,8,24,0.08);border:1px solid rgba(255,255,255,0.6);backdrop-filter: blur(6px);
+      opacity:0;
+      transform:translateY(10px) scale(0.997);
+      animation: cardFadeIn 700ms cubic-bezier(.2,.9,.2,1) 120ms forwards;
+    }
+    @keyframes cardFadeIn {
+      to { opacity:1; transform:none; }
+    }
 
-/* pretty header */
-    .top{
-      display:flex;gap:14px;align-items:center;margin-bottom:18px;
-    }
-    .avatar{
-      width:62px;height:62px;border-radius:14px;background:linear-gradient(135deg,#ffd7ea,#ffecf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#a4005f;font-size:22px;box-shadow:0 6px 18px rgba(167,0,95,0.06)
-    }
+    /* pretty header */
+    .top{ display:flex;gap:14px;align-items:center;margin-bottom:18px; }
+    .avatar{ width:62px;height:62px;border-radius:14px;background:linear-gradient(135deg,#ffd7ea,#ffecf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#a4005f;font-size:22px;box-shadow:0 6px 18px rgba(167,0,95,0.06) }
     h1{margin:0;font-size:20px;color:#462534;font-weight:600}
     p.lead{margin:0;color:#6d4a55;font-size:13px}
 
-/* letter area looks like paper with shimmer border */
+    /* letter area looks like paper with shimmer border */
     .letter {
       position:relative;
       padding:26px 26px;
       border-radius:14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,252,0.98));
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,250,252,0.99));
       box-shadow: inset 0 -8px 30px rgba(255,111,163,0.02);
       border: 1px solid rgba(255,111,163,0.09);
       overflow:visible;
@@ -65,27 +77,57 @@
     }
     @keyframes shimmer{0%{transform:rotate(-2deg) translateX(-8%)}50%{transform:rotate(-2deg) translateX(8%)}100%{transform:rotate(-2deg) translateX(-8%)}}
 
-/* typed text and caret */
-    .typed { white-space:pre-wrap; word-break:break-word; font-size:20px; }
+    /* typed text and caret */
+    .typed { white-space:pre-wrap; word-break:break-word; font-size:20px; display:block; }
+    .typed .char { display:inline-block; opacity:0; transform:translateY(6px); animation: charFade .22s ease forwards; /* animation runs when the char node is appended */ }
+    @keyframes charFade { to { opacity:1; transform:none; } }
+
     .caret { display:inline-block; width:9px; height:26px; background:linear-gradient(90deg,var(--accent),#ff9fbf); margin-left:6px; border-radius:3px; vertical-align:baseline; animation: blink 1s steps(2,start) infinite; }
     @keyframes blink{50%{opacity:0}}
 
-/* signature */
+    /* signature -> handwriting reveal */
     .signature{margin-top:18px;opacity:0;transform:translateY(10px);transition:all .8s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:6px}
     .signature.show{opacity:1;transform:none}
-    .sig-name{font-family:'Dancing Script',cursive;font-size:34px;color:#e21f78;line-height:1}
-    .sig-sub{font-size:13px;color:#6f4a53}
+    .sig-name{
+      font-family:'Dancing Script',cursive;font-size:34px;color:#e21f78;line-height:1;
+      display:inline-block; overflow:hidden; white-space:nowrap; max-width:0;
+    }
+    .signature.show .sig-name{
+      animation: write 1.6s steps(28,end) forwards;
+    }
+    @keyframes write { to { max-width:1200px; } }
 
-/* final heart pop */
-    .final-heart{position:fixed;left:50%;transform:translateX(-50%);bottom:18vh;width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0;pointer-events:none;z-index:2;animation: none;}
+    .sig-sub{font-size:13px;color:#6f4a53; opacity:0; transform: translateY(6px); transition: opacity .35s ease, transform .35s ease; }
+    .signature.show .sig-sub{ opacity:1; transform:none; transition-delay: .6s; }
 
-/* responsive tweaks */
+    /* final heart pop */
+    .final-heart{
+      position:fixed;left:50%;transform:translateX(-50%) scale(0);bottom:18vh;width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0;pointer-events:none;z-index:2;
+    }
+    @keyframes heartPop {
+      0% { transform: translateX(-50%) scale(0); opacity:0; filter: blur(2px); }
+      40% { transform: translateX(-50%) scale(1.2); opacity:1; filter: blur(0); }
+      65% { transform: translateX(-50%) scale(0.92); }
+      100% { transform: translateX(-50%) scale(1); opacity:0; }
+    }
+
+    /* animation for small emoji pop */
+    .emoji {
+      display:inline-block;
+      transform:scale(0.6);
+      opacity:0;
+      animation: emojiPop .28s ease forwards;
+    }
+    @keyframes emojiPop { to { transform:scale(1); opacity:1; } }
+
+    /* responsive tweaks */
     @media(max-width:560px){
       .card{padding:22px}
       .letter{font-size:18px}
       .typed{font-size:18px}
       .avatar{width:52px;height:52px;font-size:18px}
     }
+
   </style>
 </head>
 <body>
@@ -95,8 +137,8 @@
     <div class="top">
       <div class="avatar" aria-hidden="true">R ♥</div>
       <div>
-        <h1 id="letterTitle">For Riya — ek chhota sa letter</h1>
-        <p class="lead">Thoda sa slow, thoda sa sweet — jaise tum</p>
+        <h1 id="letterTitle">To Riya, from Naman</h1>
+        <p class="lead">Thoda sa cute, thoda sa sweet — jaise tu</p>
       </div>
     </div>
 
@@ -106,7 +148,7 @@
 
       <div id="signature" class="signature" aria-hidden="true">
         <div class="sig-name">From, your forever Naman 💞</div>
-        <div class="sig-sub">Hamesha tumhara • Dooriyan sirf numbers hain</div>
+        <div class="sig-sub">Mummaaaaa's boyyyyy</div>
       </div>
     </div>
   </div>
@@ -116,13 +158,13 @@
 <script>
 /* -------- CONFIG: EDIT THE HINGLISH LINES HERE -------- */
 const segments = [
-  {text:"Hey meri pyari Riya,\\n", pause:700},
-  {text:"Aaj bhi teri hasi ka ek chhota sa memory mere dil ko garam kar deta hai. ", pause:750, emoji:"😊"},
-  {text:"Doori kitni bhi ho, teri baatein mere paas rehti hain — calls, messages aur woh choti choti baatein jo sirf hum samajhte hain.\\n", pause:1000},
-  {text:"Main tumhe bahut miss karta hoon, par har miss ke saath ek naya promise banta hai — jaldi milenge. ", pause:900, emoji:"🤗"},
-  {text:"Tab tak ke liye, yeh chhota sa letter rakho apni pocket mein, jab kabhi tumhe thoda sa ghar chahiye ho.\\n", pause:900},
-  {text:"Tum meri favourite ho — mere har din ka bright spot. ", pause:800, emoji:"🌟"},
-  {text:"Love you, ab aur hamesha.\\n", pause:700},
+  {text:"My Riiii,", pause:700},
+  {text:" Pata nahi how to thank my babyy and the god enough ki tu meri life mein aayi. Tune mujhe chuna. ", pause:750, emoji:"😊"},
+  {text:" I love teri calls, messages, tere cute cute voice notes aur humaare chote chote mazaak jo sirf hum samajhte hain.", pause:1000},
+  {text:" Yeh chhota sa letter likh rha hu. Or bhi likhunga, to see you smile always. Humesha yeh sab links jo tujhe bhejta hu apne paas saved rakhiyo.", pause:900, emoji:"🤗"},
+  {text:" I want aise hi sab Good mornings tere saath ho, raat ko tu mujhe humesha aise sulaaaya kare. Aage exams aa rahe hain, ekdam acche se padhna, bhot saara paani peena. I know you are my beautiful star and you will shine brighter. ", pause:800, emoji:"🌟"},
+  {text:" I just have one request to you my baby girl. No matter kuch bhi situation ho, humesha mujhe choose kariyo. Humesha mere paas rahiyo. Mujhe humesha teri zaroorat hai, not for me, but for both of US🥰. Chal ab terko mujhse NIBBA vibe aaye usse pehle khatm kr rha hu letter.", pause:800, emoji:"🎀"},
+  {text:" I love you so muchhhh, abhi bhi aur hamesha bhi.", pause:700, emoji:"🫦👄"}
 ];
 /* --------------------------------------------------- */
 
@@ -134,7 +176,7 @@ const bgHearts = document.getElementById('bgHearts');
 
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-/* Typewriter with slight human-like variance */
+/* Typewriter with slight human-like variance + per-char fade */
 async function typeSegments(){
   for(let s=0;s<segments.length;s++){
     const seg = segments[s];
@@ -149,7 +191,7 @@ async function typeSegments(){
   burstBgHearts(10);
 }
 
-/* types a string character-by-character with irregular timing */
+/* types a string character-by-character with irregular timing; each char is a span so it can fade/slide in */
 async function typeText(text, maybeEmoji){
   for(let i=0;i<text.length;i++){
     const ch = text[i];
@@ -158,22 +200,31 @@ async function typeText(text, maybeEmoji){
     const vowel = "aeiouAEIOUअआइईउऊएऐओऔािीुूेैोौंँँ";
     let jitter = Math.random()*40;
     let extra = vowel.includes(ch) ? 40 : 0;
-    typedEl.innerText += ch;
     // occasionally add a tiny pause for punctuation / new line
-    const punct = ['.',',','!','?','\\n'];
+    const punct = ['.',',','!','?','\n'];
+
+    // create a char span for a nicer fade/slide-in
+    const span = document.createElement('span');
+    span.className = 'char';
+    span.textContent = ch;
+    // small random micro-delay for per-char fade, keeps it lively
+    const microDelay = Math.floor(Math.random()*60);
+    span.style.animationDelay = `${microDelay}ms`;
+    typedEl.appendChild(span);
+
     await wait(base + jitter + extra + (punct.includes(ch) ? 180 : 0));
     // keep the caret visible and scroll
     scrollSmooth();
   }
+
   if(maybeEmoji){
     const span = document.createElement('span');
+    span.className = 'emoji';
     span.textContent = ' ' + maybeEmoji + ' ';
-    span.style.display = 'inline-block';
-    span.style.transform = 'scale(0.6)';
-    span.style.transition = 'transform .25s ease';
+    // slightly delay emoji pop so it feels intentional
+    span.style.animationDelay = '40ms';
     typedEl.appendChild(span);
-    // tiny pop effect
-    requestAnimationFrame(()=> span.style.transform = 'scale(1)');
+    // tiny pop effect (CSS handles it)
     scrollSmooth();
   }
 }
@@ -186,32 +237,32 @@ function scrollSmooth(){
   const y = window.scrollY + rect.top - 40; // top of card
   // prefer to scroll to end of text
   const bottom = document.body.scrollHeight;
+  // smooth only if user hasn't requested reduced motion
   window.scrollTo({ top: Math.min(y + rect.height, bottom), behavior: 'smooth' });
 }
 
 /* final heart pop */
 function popFinalHeart(){
   finalHeart.style.opacity = 1;
-  finalHeart.style.transform = 'translateX(-50%) scale(0.6)';
-  finalHeart.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1), opacity 600ms';
-  setTimeout(()=> finalHeart.style.transform = 'translateX(-50%) scale(1.12)', 60);
-  setTimeout(()=> finalHeart.style.transform = 'translateX(-50%) scale(1)', 700);
-  setTimeout(()=> finalHeart.style.opacity = 0, 3200);
+  finalHeart.style.animation = 'heartPop 1.4s ease-out forwards';
+  // let it auto-fade via the keyframe (100% opacity:0)
 }
 
-/* background floating hearts generator */
-function createBgHeart(xPercent, delay, size){
+/* background floating hearts generator (accept chars like sparkles) */
+function createBgHeart(xPercent, delay, size, char){
   const el = document.createElement('div');
   el.className = 'h';
-  el.style.left = (xPercent||Math.random()*100) + '%';
+  el.style.left = (typeof xPercent === 'number' ? xPercent : Math.random()*100) + '%';
   el.style.bottom = '-30px';
   el.style.fontSize = (size || (12 + Math.random()*30)) + 'px';
-  el.style.animationDuration = (6 + Math.random()*6) + 's';
+  const dur = (6 + Math.random()*6);
+  el.style.animationDuration = dur + 's';
   el.style.animationDelay = (delay||0) + 's';
-  el.textContent = ['💖','💗','💕','❤️'][Math.floor(Math.random()*4)];
+  const pool = ['💖','💗','💕','❤️'];
+  el.textContent = char || pool[Math.floor(Math.random()*pool.length)];
   bgHearts.appendChild(el);
   // remove after animation
-  setTimeout(()=> el.remove(), (parseFloat(el.style.animationDuration) + (parseFloat(el.style.animationDelay)||0))*1000 + 600);
+  setTimeout(()=> el.remove(), (dur + (parseFloat(el.style.animationDelay)||0))*1000 + 800);
 }
 
 /* occasionally burst many hearts */
@@ -221,19 +272,26 @@ function burstBgHearts(count){
   }
 }
 
-/* gentle periodic hearts */
-setInterval(()=> createBgHeart(), 900);
+/* gentle periodic hearts + occasional sparkles */
+setInterval(()=>{
+  if(Math.random() < 0.28){
+    const sparkles = ['✨','🌟','💫'];
+    createBgHeart(undefined, undefined, 12 + Math.random()*10, sparkles[Math.floor(Math.random()*sparkles.length)]);
+  } else {
+    createBgHeart();
+  }
+}, 900);
 
 /* start */
 window.addEventListener('load', ()=> {
   setTimeout(()=> typeSegments(), 700);
 });
 
-/* accessibility: allow keyboard Enter to skip ahead to final (but not to speed type) */
+/* accessibility: allow Escape to reveal full text immediately (but not speed type) */
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape'){
-    // reveal full text immediately if user presses Escape
-    const full = segments.map(s=>s.text + (s.emoji?(' '+s.emoji+' '):'')).join('\\n');
+    const full = segments.map(s=>s.text + (s.emoji?(' '+s.emoji+' '):'')).join('\n');
+    // put plain text, preserving emojis — this bypasses per-char spans when user asks to reveal
     typedEl.innerText = full;
     caret.style.display = 'none';
     signature.classList.add('show');
